@@ -18,12 +18,14 @@ import {
   Trash2,
   BellOff,
   Edit2,
+  ChevronDown,
 } from 'lucide-react';
 
 function App() {
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [currentPage, setCurrentPage] = useState('home');
-  const [timeline, setTimeline] = useState([]); // শুরুতে খালি থাকবে
+  const [timeline, setTimeline] = useState([]);
+  const [filter, setFilter] = useState('All');
 
   const [friends] = useState([
     {
@@ -146,6 +148,9 @@ function App() {
     setTimeline([newLog, ...timeline]);
   };
 
+  const filteredTimeline =
+    filter === 'All' ? timeline : timeline.filter(item => item.type === filter);
+
   const getStatusStyles = status => {
     switch (status) {
       case 'overdue':
@@ -208,16 +213,29 @@ function App() {
         {currentPage === 'timeline' ? (
           <div className="max-w-2xl mx-auto animate-in fade-in duration-500">
             <h2 className="text-4xl font-bold text-[#0F172A] mb-2">Timeline</h2>
-            <p className="text-[#64748B] mb-10 text-lg">
-              Tracking your meaningful interactions over time.
-            </p>
+            <div className="relative mb-8 w-full max-w-[200px]">
+              <select
+                value={filter}
+                onChange={e => setFilter(e.target.value)}
+                className="w-full appearance-none bg-white border border-[#E2E8F0] text-[#64748B] py-2.5 px-4 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#244D3F] transition-all cursor-pointer font-medium"
+              >
+                <option value="All">Filter timeline</option>
+                <option value="Call">Call</option>
+                <option value="Text">Text</option>
+                <option value="Video">Video</option>
+              </select>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#94A3B8]">
+                <ChevronDown size={18} />
+              </div>
+            </div>
+
             <div className="space-y-4">
-              {timeline.length === 0 ? (
+              {filteredTimeline.length === 0 ? (
                 <p className="text-center text-[#94A3B8] py-20 bg-[#F8FAFC] rounded-3xl border-2 border-dashed border-[#EDF2F7]">
                   No interactions recorded yet.
                 </p>
               ) : (
-                timeline.map(log => (
+                filteredTimeline.map(log => (
                   <div
                     key={log.id}
                     className="flex items-center justify-between bg-white p-6 rounded-2xl border border-[#F1F5F9] shadow-sm"
