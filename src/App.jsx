@@ -166,7 +166,6 @@ function App() {
           </button>
         </div>
 
-  
         <div className="grid grid-cols-4 gap-4 mb-20">
           {stats.map((s, i) => (
             <div
@@ -220,6 +219,77 @@ function App() {
           </div>
         </section>
       </main>
+
+      <footer className="bg-[#244D3F] text-white py-16 px-4 md:px-[10%] mt-auto">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col items-center justify-center text-center gap-10">
+            {/* Logo and Tagline */}
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex items-center gap-3">
+                <img
+                  src={logoImg}
+                  alt="KeenKeeper Logo"
+                  className="h-15 w-auto invert brightness-5"
+                />
+              </div>
+              <p className="text-[#98B5AB] max-w-xl text-lg">
+                Your personal shelf of meaningful connections. Browse, tend, and
+                nurture the relationships that matter most.
+              </p>
+            </div>
+
+            <div className="flex flex-col items-center gap-5">
+              <h4 className="text-xl font-semibold">Social Links</h4>
+              <div className="flex items-center gap-6">
+                <a
+                  href="#"
+                  className="w-10 h-10 flex items-center justify-center rounded-full border border-[#406757] hover:bg-[#2d5d4c] transition-all"
+                >
+                  <img
+                    src={facebookImg}
+                    alt="Facebook"
+                    className="w-5 h-5 object-contain"
+                  />
+                </a>
+                <a
+                  href="#"
+                  className="w-10 h-10 flex items-center justify-center rounded-full border border-[#406757] hover:bg-[#2d5d4c] transition-all"
+                >
+                  <img
+                    src={instagramImg}
+                    alt="Instagram"
+                    className="w-5 h-5 object-contain"
+                  />
+                </a>
+                <a
+                  href="#"
+                  className="w-10 h-10 flex items-center justify-center rounded-full border border-[#406757] hover:bg-[#2d5d4c] transition-all"
+                >
+                  <img
+                    src={twitterImg}
+                    alt="Twitter"
+                    className="w-5 h-5 object-contain"
+                  />
+                </a>
+              </div>
+            </div>
+          </div>
+          <div className="mt-16 pt-8 border-t border-[#406757] flex flex-col md:flex-row items-center justify-between text-sm text-[#98B5AB] gap-6">
+            <p>&copy; 2024 KeenKeeper. All rights reserved.</p>
+            <div className="flex items-center gap-6">
+              <a href="#" className="hover:text-white transition-colors">
+                Privacy Policy
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                Terms of Service
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                Cookies
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
