@@ -22,6 +22,8 @@ import {
 
 function App() {
   const [selectedFriend, setSelectedFriend] = useState(null);
+  const [currentPage, setCurrentPage] = useState('home');
+  const [timeline, setTimeline] = useState([]); // শুরুতে খালি থাকবে
 
   const [friends] = useState([
     {
@@ -134,12 +136,15 @@ function App() {
     },
   ]);
 
-  const stats = [
-    { label: 'Total Friends', value: 10 },
-    { label: 'On Track', value: 3 },
-    { label: 'Need Attention', value: 6 },
-    { label: 'Interactions This Month', value: 12 },
-  ];
+  const addActivity = (type, person, icon) => {
+    const today = new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(new Date());
+    const newLog = { id: Date.now(), type, person, date: today, icon };
+    setTimeline([newLog, ...timeline]);
+  };
 
   const getStatusStyles = status => {
     switch (status) {
@@ -154,39 +159,42 @@ function App() {
     }
   };
 
-  const today = new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: '2-digit',
-    year: 'numeric',
-  }).format(new Date());
-
-  const tomorrowDate = new Date();
-  tomorrowDate.setDate(tomorrowDate.getDate() + 1);
   const tomorrow = new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: '2-digit',
     year: 'numeric',
-  }).format(tomorrowDate);
+  }).format(new Date(new Date().setDate(new Date().getDate() + 1)));
 
   return (
     <div className="min-h-screen bg-white font-sans text-[#1E293B] flex flex-col">
-     
       <header className="border-b border-[#E9E9E9] px-4 py-3 md:px-[10%] sticky top-0 bg-white z-50">
         <nav className="flex items-center justify-between max-w-7xl mx-auto">
           <div
             className="flex items-center gap-2 cursor-pointer"
-            onClick={() => setSelectedFriend(null)}
+            onClick={() => {
+              setSelectedFriend(null);
+              setCurrentPage('home');
+            }}
           >
             <img src={logoImg} alt="logo" className="h-8 w-auto" />
           </div>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => setSelectedFriend(null)}
-              className={`flex items-center gap-2 text-sm font-medium px-5 py-2 rounded-full transition-all ${!selectedFriend ? 'bg-[#244D3F] text-white' : 'text-[#64748B]'}`}
+              onClick={() => {
+                setSelectedFriend(null);
+                setCurrentPage('home');
+              }}
+              className={`flex items-center gap-2 text-sm font-medium px-5 py-2 rounded-full transition-all ${currentPage === 'home' && !selectedFriend ? 'bg-[#244D3F] text-white' : 'text-[#64748B]'}`}
             >
               <Home size={18} /> Home
             </button>
-            <button className="flex items-center gap-2 text-sm font-medium text-[#64748B] hover:text-[#1E1E1E]">
+            <button
+              onClick={() => {
+                setSelectedFriend(null);
+                setCurrentPage('timeline');
+              }}
+              className={`flex items-center gap-2 text-sm font-medium px-5 py-2 rounded-full transition-all ${currentPage === 'timeline' ? 'bg-[#244D3F] text-white' : 'text-[#64748B]'}`}
+            >
               <TimerReset size={18} /> Timeline
             </button>
             <button className="flex items-center gap-2 text-sm font-medium text-[#64748B] hover:text-[#1E1E1E]">
@@ -197,14 +205,63 @@ function App() {
       </header>
 
       <main className="flex-grow max-w-6xl mx-auto px-6 py-12 w-full">
-        {!selectedFriend ? (
-    
+        {currentPage === 'timeline' ? (
+          <div className="max-w-2xl mx-auto animate-in fade-in duration-500">
+            <h2 className="text-4xl font-bold text-[#0F172A] mb-2">Timeline</h2>
+            <p className="text-[#64748B] mb-10 text-lg">
+              Tracking your meaningful interactions over time.
+            </p>
+            <div className="space-y-4">
+              {timeline.length === 0 ? (
+                <p className="text-center text-[#94A3B8] py-20 bg-[#F8FAFC] rounded-3xl border-2 border-dashed border-[#EDF2F7]">
+                  No interactions recorded yet.
+                </p>
+              ) : (
+                timeline.map(log => (
+                  <div
+                    key={log.id}
+                    className="flex items-center justify-between bg-white p-6 rounded-2xl border border-[#F1F5F9] shadow-sm"
+                  >
+                    <div className="flex items-center gap-5">
+                      <div className="w-12 h-12 bg-[#F8FAFC] rounded-xl flex items-center justify-center border border-[#EDF2F7]">
+                        <img
+                          src={log.icon}
+                          alt={log.type}
+                          className="w-5 h-5 object-contain"
+                        />
+                      </div>
+                      <div>
+                        <p className="text-[#64748B] text-base">
+                          <span className="font-bold text-[#0F172A]">
+                            {log.type}
+                          </span>{' '}
+                          with {log.person}
+                        </p>
+                        <p className="text-[12px] text-[#94A3B8] font-bold mt-1 uppercase tracking-wide">
+                          {log.date}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() =>
+                        setTimeline(timeline.filter(t => t.id !== log.id))
+                      }
+                      className="text-[#94A3B8] hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        ) : !selectedFriend ? (
           <>
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-[#0F172A] mb-4">
                 Friends to keep close in your life
               </h2>
-              <p className="text-[#64748B] max-w-lg mx-auto mb-8">
+              <p className="text-[#64748B] max-w-lg mx-auto mb-8 text-lg">
                 Your personal shelf of meaningful connections. Browse, tend, and
                 nurture the relationships that matter most.
               </p>
@@ -212,9 +269,13 @@ function App() {
                 <Plus size={18} /> Add a Friend
               </button>
             </div>
-
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-20">
-              {stats.map((s, i) => (
+              {[
+                { label: 'Total Friends', value: 10 },
+                { label: 'On Track', value: 3 },
+                { label: 'Need Attention', value: 6 },
+                { label: 'Interactions This Month', value: 12 },
+              ].map((s, i) => (
                 <div
                   key={i}
                   className="bg-white p-8 rounded-2xl border border-[#F1F5F9] text-center shadow-sm"
@@ -226,7 +287,6 @@ function App() {
                 </div>
               ))}
             </div>
-
             <section>
               <h3 className="text-xl font-bold mb-8">Your Friends</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
@@ -266,7 +326,6 @@ function App() {
             </section>
           </>
         ) : (
-         
           <div className="max-w-4xl mx-auto animate-in fade-in duration-300">
             <button
               onClick={() => setSelectedFriend(null)}
@@ -274,9 +333,7 @@ function App() {
             >
               <ArrowLeft size={20} /> Back to Dashboard
             </button>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
               <div className="bg-white p-8 rounded-[32px] border border-[#F1F5F9] shadow-sm text-center">
                 <img
                   src={selectedFriend.picture}
@@ -289,25 +346,6 @@ function App() {
                 >
                   {selectedFriend.status}
                 </div>
-
-                <div className="mt-4 flex flex-wrap justify-center gap-1">
-                  {selectedFriend.tags.map((t, idx) => (
-                    <span
-                      key={idx}
-                      className="text-[9px] font-extrabold bg-[#F0FDF4] text-[#166534] px-2 py-0.5 rounded uppercase"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-
-                <p className="text-sm text-[#64748B] mt-4 italic">
-                  "Former colleague, great mentor"
-                </p>
-                <div className="mt-4 flex items-center justify-center gap-2 text-xs text-[#94A3B8] font-medium">
-                  Preferred: email
-                </div>
-
                 <div className="mt-8 flex flex-col gap-3">
                   <button className="w-full py-2.5 border border-[#E2E8F0] rounded-xl flex items-center justify-center gap-2 text-sm font-bold hover:bg-gray-50 transition">
                     <BellOff size={16} /> Snooze 2 Weeks
@@ -320,8 +358,6 @@ function App() {
                   </button>
                 </div>
               </div>
-
-            
               <div className="md:col-span-2 space-y-6">
                 <div className="grid grid-cols-3 gap-4">
                   <div className="bg-white p-6 rounded-2xl border border-[#F1F5F9] text-center shadow-sm">
@@ -343,51 +379,38 @@ function App() {
                     </p>
                   </div>
                 </div>
-
-            
-                <div className="bg-white p-6 rounded-2xl border border-[#F1F5F9] shadow-sm flex items-center justify-between">
-                  <div>
-                    <h4 className="text-sm font-bold mb-1">
-                      Relationship Goal
-                    </h4>
-                    <p className="text-sm text-[#64748B]">
-                      Connect every{' '}
-                      <span className="font-bold text-black">30 days</span>
-                    </p>
-                  </div>
-                  <button className="p-2 border border-[#E2E8F0] rounded-lg text-[#64748B] hover:bg-gray-50">
-                    <Edit2 size={14} />
-                  </button>
-                </div>
                 <div className="bg-white p-8 rounded-3xl border border-[#F1F5F9] shadow-sm">
                   <h4 className="font-bold mb-6">Quick Check-In</h4>
                   <div className="grid grid-cols-3 gap-4">
-                    <button className="flex flex-col items-center gap-3 p-6 border border-[#F1F5F9] rounded-2xl hover:bg-gray-50 transition-all group">
-                      <img
-                        src={callImg}
-                        className="h-6 w-auto grayscale group-hover:grayscale-0 transition"
-                        alt=""
-                      />
+                    <button
+                      onClick={() =>
+                        addActivity('Call', selectedFriend.name, callImg)
+                      }
+                      className="flex flex-col items-center gap-3 p-6 border border-[#F1F5F9] rounded-2xl hover:bg-gray-50 transition-all group"
+                    >
+                      <img src={callImg} className="h-6 w-auto" alt="Call" />
                       <span className="text-xs font-bold uppercase tracking-wider">
                         Call
                       </span>
                     </button>
-                    <button className="flex flex-col items-center gap-3 p-6 border border-[#F1F5F9] rounded-2xl hover:bg-gray-50 transition-all group">
-                      <img
-                        src={textImg}
-                        className="h-6 w-auto grayscale group-hover:grayscale-0 transition"
-                        alt=""
-                      />
+                    <button
+                      onClick={() =>
+                        addActivity('Text', selectedFriend.name, textImg)
+                      }
+                      className="flex flex-col items-center gap-3 p-6 border border-[#F1F5F9] rounded-2xl hover:bg-gray-50 transition-all group"
+                    >
+                      <img src={textImg} className="h-6 w-auto" alt="Text" />
                       <span className="text-xs font-bold uppercase tracking-wider">
                         Text
                       </span>
                     </button>
-                    <button className="flex flex-col items-center gap-3 p-6 border border-[#F1F5F9] rounded-2xl hover:bg-gray-50 transition-all group">
-                      <img
-                        src={videoImg}
-                        className="h-6 w-auto grayscale group-hover:grayscale-0 transition"
-                        alt=""
-                      />
+                    <button
+                      onClick={() =>
+                        addActivity('Video', selectedFriend.name, videoImg)
+                      }
+                      className="flex flex-col items-center gap-3 p-6 border border-[#F1F5F9] rounded-2xl hover:bg-gray-50 transition-all group"
+                    >
+                      <img src={videoImg} className="h-6 w-auto" alt="Video" />
                       <span className="text-xs font-bold uppercase tracking-wider">
                         Video
                       </span>
@@ -400,69 +423,32 @@ function App() {
         )}
       </main>
 
-      <footer className="bg-[#244D3F] text-white py-16 px-4 md:px-[10%] mt-auto">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col items-center justify-center text-center gap-10">
-            <div className="flex flex-col items-center gap-4">
-              <div className="flex items-center gap-3">
-                <h2 className="text-4xl font-bold tracking-tight">
-                  KeenKeeper
-                </h2>
-              </div>
-              <p className="text-[#98B5AB] max-w-xl text-3">
-                Your personal shelf of meaningful connections. Browse, tend, and nurture the relationships that matter most.
-              </p>
-            </div>
-
-            <div className="flex flex-col items-center gap-5">
-              <h4 className="text-xl font-semibold">Social Links</h4>
-              <div className="flex items-center gap-6">
-                <a
-                  href="#"
-                  className="w-10 h-10 flex items-center justify-center rounded-full border border-[#406757] hover:bg-[#2d5d4c] transition-all"
-                >
-                  <img
-                    src={facebookImg}
-                    alt="Facebook"
-                    className="w-5 h-5 object-contain"
-                  />
-                </a>
-                <a
-                  href="#"
-                  className="w-10 h-10 flex items-center justify-center rounded-full border border-[#406757] hover:bg-[#2d5d4c] transition-all"
-                >
-                  <img
-                    src={instagramImg}
-                    alt="Instagram"
-                    className="w-5 h-5 object-contain"
-                  />
-                </a>
-                <a
-                  href="#"
-                  className="w-10 h-10 flex items-center justify-center rounded-full border border-[#406757] hover:bg-[#2d5d4c] transition-all"
-                >
-                  <img
-                    src={twitterImg}
-                    alt="Twitter"
-                    className="w-5 h-5 object-contain"
-                  />
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="mt-16 pt-8 border-t border-[#406757] flex flex-col md:flex-row items-center justify-between text-sm text-[#98B5AB] gap-6">
-            <p>&copy; 2024 KeenKeeper. All rights reserved.</p>
-            <div className="flex items-center gap-6">
-              <a href="#" className="hover:text-white transition-colors">
-                Privacy Policy
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
-                Terms of Service
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
-                Cookies
-              </a>
-            </div>
+      <footer className="bg-[#244D3F] text-white py-16 px-4 md:px-[10%] mt-auto text-center">
+        <h2 className="text-4xl font-bold mb-4">KeenKeeper</h2>
+        <p className="text-[#98B5AB] max-w-xl mx-auto mb-10 text-lg">
+          Your personal shelf of meaningful connections. Browse, tend, and
+          nurture the relationships that matter most.
+        </p>
+        <div className="flex justify-center gap-6 mb-16">
+          {[facebookImg, instagramImg, twitterImg].map((icon, idx) => (
+            <a
+              key={idx}
+              href="#"
+              className="w-10 h-10 flex items-center justify-center rounded-full border border-[#406757] hover:bg-[#2d5d4c] transition-all"
+            >
+              <img src={icon} alt="Social" className="w-5 h-5 object-contain" />
+            </a>
+          ))}
+        </div>
+        <div className="pt-8 border-t border-[#406757] flex flex-col md:flex-row items-center justify-between text-sm text-[#98B5AB] max-w-7xl mx-auto w-full">
+          <p>&copy; 2026 KeenKeeper. All rights reserved.</p>
+          <div className="flex gap-6">
+            <a href="#" className="hover:text-white">
+              Privacy Policy
+            </a>
+            <a href="#" className="hover:text-white">
+              Terms of Service
+            </a>
           </div>
         </div>
       </footer>
