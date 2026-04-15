@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import {
   BrowserRouter,
@@ -7,6 +8,7 @@ import {
   useNavigate,
   useLocation,
 } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 import logoImg from './assets/logo.png';
 import callImg from './assets/call.png';
 import facebookImg from './assets/facebook.png';
@@ -26,6 +28,7 @@ import {
   ChevronDown,
   Loader2,
 } from 'lucide-react';
+
 
 function PageLoader({ children }) {
   const [loading, setLoading] = useState(true);
@@ -51,12 +54,14 @@ function PageLoader({ children }) {
   return <div className="animate-in fade-in duration-500">{children}</div>;
 }
 
+
 function Layout({ children, setSelectedFriend }) {
   const navigate = useNavigate();
   const location = useLocation();
 
   return (
     <div className="min-h-screen bg-white font-sans text-[#1E293B] flex flex-col">
+      <Toaster position="top-center" reverseOrder={false} />
       <header className="border-b border-[#E9E9E9] px-4 py-3 md:px-[10%] sticky top-0 bg-white z-50">
         <nav className="flex items-center justify-between max-w-7xl mx-auto">
           <div
@@ -123,7 +128,7 @@ function Layout({ children, setSelectedFriend }) {
         </div>
         <div className="pt-8 border-t border-[#406757] flex flex-col md:flex-row items-center justify-between text-sm text-[#98B5AB] max-w-7xl mx-auto w-full">
           <p>&copy; 2026 KeenKeeper. All rights reserved.</p>
-          <div className="flex gap-6">
+          <div className="flex gap-6 font-medium">
             <a href="#" className="hover:text-white">
               Privacy Policy
             </a>
@@ -136,6 +141,7 @@ function Layout({ children, setSelectedFriend }) {
     </div>
   );
 }
+
 
 function AppContent() {
   const [selectedFriend, setSelectedFriend] = useState(null);
@@ -252,6 +258,16 @@ function AppContent() {
       { id: Date.now(), type, person, date: today, icon },
       ...timeline,
     ]);
+
+    toast.success(`${type} recorded with ${person}`, {
+      style: {
+        borderRadius: '12px',
+        background: '#244D3F',
+        color: '#fff',
+        fontWeight: 'bold',
+      },
+      iconTheme: { primary: '#fff', secondary: '#244D3F' },
+    });
   };
 
   const getStatusStyles = status => {
@@ -275,10 +291,12 @@ function AppContent() {
   const videoCount = timeline.filter(item => item.type === 'Video').length;
   const callCount = timeline.filter(item => item.type === 'Call').length;
   const messageCount = timeline.filter(item => item.type === 'Text').length;
-  const totalInteractions = videoCount + callCount + messageCount || 1;
 
   const calculateSlice = count =>
-    (count / totalInteractions) * (2 * Math.PI * 70) + ' ' + 2 * Math.PI * 70;
+    (count / (videoCount + callCount + messageCount || 1)) *
+      (2 * Math.PI * 70) +
+    ' ' +
+    2 * Math.PI * 70;
 
   return (
     <Routes>
@@ -351,7 +369,7 @@ function AppContent() {
                           onClick={() =>
                             addActivity('Call', selectedFriend.name, callImg)
                           }
-                          className="flex flex-col items-center gap-3 p-6 border border-[#F1F5F9] rounded-2xl hover:bg-gray-50 transition-all group"
+                          className="flex flex-col items-center gap-3 p-6 border border-[#F1F5F9] rounded-2xl hover:bg-gray-50 group"
                         >
                           <img src={callImg} className="h-6 w-auto" alt="" />
                           <span className="text-xs font-bold uppercase">
@@ -362,7 +380,7 @@ function AppContent() {
                           onClick={() =>
                             addActivity('Text', selectedFriend.name, textImg)
                           }
-                          className="flex flex-col items-center gap-3 p-6 border border-[#F1F5F9] rounded-2xl hover:bg-gray-50 transition-all group"
+                          className="flex flex-col items-center gap-3 p-6 border border-[#F1F5F9] rounded-2xl hover:bg-gray-50 group"
                         >
                           <img src={textImg} className="h-6 w-auto" alt="" />
                           <span className="text-xs font-bold uppercase">
@@ -373,7 +391,7 @@ function AppContent() {
                           onClick={() =>
                             addActivity('Video', selectedFriend.name, videoImg)
                           }
-                          className="flex flex-col items-center gap-3 p-6 border border-[#F1F5F9] rounded-2xl hover:bg-gray-50 transition-all group"
+                          className="flex flex-col items-center gap-3 p-6 border border-[#F1F5F9] rounded-2xl hover:bg-gray-50 group"
                         >
                           <img src={videoImg} className="h-6 w-auto" alt="" />
                           <span className="text-xs font-bold uppercase">
@@ -386,7 +404,7 @@ function AppContent() {
                 </div>
               </div>
             ) : (
-              <div className="animate-in fade-in duration-500">
+              <div>
                 <div className="text-center mb-16">
                   <h2 className="text-4xl font-bold text-[#0F172A] mb-4 tracking-tighter">
                     Friends to keep close in your life
@@ -395,7 +413,7 @@ function AppContent() {
                     Your personal shelf of meaningful connections. Browse, tend,
                     and nurture the relationships that matter most.
                   </p>
-                  <button className="bg-[#244D3F] text-white px-6 py-2.5 rounded-lg flex items-center gap-2 mx-auto hover:bg-[#1a3a2f] transition shadow-md">
+                  <button className="bg-[#244D3F] text-white px-6 py-2.5 rounded-lg flex items-center gap-2 mx-auto hover:bg-[#1a3a2f] shadow-md transition-all">
                     <Plus size={18} /> Add a Friend
                   </button>
                 </div>
@@ -408,7 +426,7 @@ function AppContent() {
                   ].map((s, i) => (
                     <div
                       key={i}
-                      className="bg-white p-8 rounded-2xl border border-[#F1F5F9] text-center shadow-sm"
+                      className="bg-white p-8 rounded-2xl border border-[#F1F5F9] text-center shadow-sm hover:shadow-md transition-shadow"
                     >
                       <div className="text-4xl font-bold mb-1">{s.value}</div>
                       <div className="text-[10px] text-[#94A3B8] font-bold uppercase tracking-widest">
@@ -424,7 +442,7 @@ function AppContent() {
                       <div
                         key={friend.id}
                         onClick={() => setSelectedFriend(friend)}
-                        className="bg-white p-8 rounded-[24px] border border-[#F1F5F9] shadow-sm flex flex-col items-center text-center hover:shadow-xl transition-all cursor-pointer group"
+                        className="bg-white p-8 rounded-[24px] border border-[#F1F5F9] shadow-sm flex flex-col items-center text-center cursor-pointer group hover:shadow-xl transition-all"
                       >
                         <img
                           src={friend.picture}
@@ -461,6 +479,7 @@ function AppContent() {
           </Layout>
         }
       />
+
       <Route
         path="/timeline"
         element={
@@ -473,16 +492,17 @@ function AppContent() {
                 <select
                   value={filter}
                   onChange={e => setFilter(e.target.value)}
-                  className="w-full appearance-none bg-white border border-[#E2E8F0] text-[#64748B] py-2.5 px-4 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#244D3F] transition-all cursor-pointer font-medium"
+                  className="w-full appearance-none bg-white border border-[#E2E8F0] py-2.5 px-4 rounded-xl cursor-pointer font-medium focus:ring-2 focus:ring-[#244D3F] outline-none"
                 >
                   <option value="All">Filter timeline</option>
                   <option value="Call">Call</option>
                   <option value="Text">Text</option>
                   <option value="Video">Video</option>
                 </select>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#94A3B8]">
-                  <ChevronDown size={18} />
-                </div>
+                <ChevronDown
+                  size={18}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] pointer-events-none"
+                />
               </div>
               <div className="space-y-4">
                 {timeline.length === 0 ? (
@@ -495,7 +515,7 @@ function AppContent() {
                     .map(log => (
                       <div
                         key={log.id}
-                        className="flex items-center justify-between bg-white p-6 rounded-2xl border border-[#F1F5F9] shadow-sm"
+                        className="flex items-center justify-between bg-white p-6 rounded-2xl border border-[#F1F5F9] shadow-sm animate-in slide-in-from-bottom-2 duration-300"
                       >
                         <div className="flex items-center gap-5">
                           <div className="w-12 h-12 bg-[#F8FAFC] rounded-xl flex items-center justify-center border border-[#EDF2F7]">
@@ -506,7 +526,7 @@ function AppContent() {
                             />
                           </div>
                           <div>
-                            <p className="text-[#64748B] text-base">
+                            <p className="text-[#64748B]">
                               <span className="font-bold text-[#0F172A]">
                                 {log.type}
                               </span>{' '}
@@ -533,12 +553,13 @@ function AppContent() {
           </Layout>
         }
       />
+
       <Route
         path="/stats"
         element={
           <Layout setSelectedFriend={setSelectedFriend}>
             <section className="max-w-4xl mx-auto">
-              <h1 className="text-6xl font-black text-[#0F172A] mb-12 tracking-tighter text-center md:text-left">
+              <h1 className="text-6xl font-black text-[#0F172A] mb-12 tracking-tighter">
                 Friendship Analytics
               </h1>
               <div className="bg-white p-12 rounded-[40px] border border-[#F1F5F9] shadow-sm flex flex-col items-center">
@@ -552,7 +573,7 @@ function AppContent() {
                     width="100%"
                     height="100%"
                     viewBox="0 0 180 180"
-                    className="-rotate-90"
+                    className="-rotate-90 transition-transform"
                   >
                     <circle
                       cx="90"
@@ -604,21 +625,21 @@ function AppContent() {
                     />
                   </svg>
                 </div>
-                <div className="flex flex-wrap justify-center gap-10 mt-16">
+                <div className="flex gap-10 mt-16 flex-wrap justify-center">
                   <div className="flex items-center gap-3">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#8B5CF6]"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#8B5CF6]"></div>
                     <span className="text-sm font-bold text-[#64748B] uppercase tracking-wider">
                       Text
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#4ADE80]"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#4ADE80]"></div>
                     <span className="text-sm font-bold text-[#64748B] uppercase tracking-wider">
                       Call
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#244D3F]"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#244D3F]"></div>
                     <span className="text-sm font-bold text-[#64748B] uppercase tracking-wider">
                       Video
                     </span>
@@ -629,6 +650,7 @@ function AppContent() {
           </Layout>
         }
       />
+
       <Route
         path="*"
         element={
@@ -640,13 +662,13 @@ function AppContent() {
               Page Not Found
             </h2>
             <p className="text-[#64748B] text-lg mb-10 max-w-md mx-auto">
-              Sorry, the page you are looking for doesn't exist.
+              Sorry, we couldn't find the page you're looking for.
             </p>
             <button
               onClick={() => navigate('/')}
-              className="text-[#3B82F6] font-semibold text-xl hover:underline underline-offset-8 transition-all"
+              className="bg-[#244D3F] text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg transition-all"
             >
-              Go back home
+              Go Back Home
             </button>
           </div>
         }
