@@ -3,7 +3,6 @@ import logoImg from './assets/logo.png';
 import callImg from './assets/call.png';
 import facebookImg from './assets/facebook.png';
 import instagramImg from './assets/instagram.png';
-import logoXlImg from './assets/logo-xl.png';
 import textImg from './assets/text.png';
 import twitterImg from './assets/twitter.png';
 import videoImg from './assets/video.png';
@@ -13,11 +12,9 @@ import {
   BarChart3,
   Plus,
   ArrowLeft,
-  Mail,
-  Archive,
   Trash2,
   BellOff,
-  Edit2,
+  Archive,
   ChevronDown,
 } from 'lucide-react';
 
@@ -170,6 +167,17 @@ function App() {
     year: 'numeric',
   }).format(new Date(new Date().setDate(new Date().getDate() + 1)));
 
+  const messageCount = timeline.filter(item => item.type === 'Text').length;
+  const callCount = timeline.filter(item => item.type === 'Call').length;
+  const videoCount = timeline.filter(item => item.type === 'Video').length;
+  const totalRaw = messageCount + callCount + videoCount;
+  const totalInteractions = totalRaw || 1;
+
+  const calculateSlice = count => {
+    const circumference = 2 * Math.PI * 70;
+    return `${(count / totalInteractions) * circumference} ${circumference}`;
+  };
+
   return (
     <div className="min-h-screen bg-white font-sans text-[#1E293B] flex flex-col">
       <header className="border-b border-[#E9E9E9] px-4 py-3 md:px-[10%] sticky top-0 bg-white z-50">
@@ -202,7 +210,13 @@ function App() {
             >
               <TimerReset size={18} /> Timeline
             </button>
-            <button className="flex items-center gap-2 text-sm font-medium text-[#64748B] hover:text-[#1E1E1E]">
+            <button
+              onClick={() => {
+                setSelectedFriend(null);
+                setCurrentPage('stats');
+              }}
+              className={`flex items-center gap-2 text-sm font-medium px-5 py-2 rounded-full transition-all ${currentPage === 'stats' ? 'bg-[#244D3F] text-white' : 'text-[#64748B]'}`}
+            >
               <BarChart3 size={18} /> Stats
             </button>
           </div>
@@ -210,9 +224,11 @@ function App() {
       </header>
 
       <main className="flex-grow max-w-6xl mx-auto px-6 py-12 w-full">
-        {currentPage === 'timeline' ? (
+        {currentPage === 'timeline' && (
           <div className="max-w-2xl mx-auto animate-in fade-in duration-500">
-            <h2 className="text-4xl font-bold text-[#0F172A] mb-2">Timeline</h2>
+            <h2 className="text-4xl font-bold text-[#0F172A] mb-2 tracking-tighter">
+              Timeline
+            </h2>
             <div className="relative mb-8 w-full max-w-[200px]">
               <select
                 value={filter}
@@ -228,7 +244,6 @@ function App() {
                 <ChevronDown size={18} />
               </div>
             </div>
-
             <div className="space-y-4">
               {filteredTimeline.length === 0 ? (
                 <p className="text-center text-[#94A3B8] py-20 bg-[#F8FAFC] rounded-3xl border-2 border-dashed border-[#EDF2F7]">
@@ -244,7 +259,7 @@ function App() {
                       <div className="w-12 h-12 bg-[#F8FAFC] rounded-xl flex items-center justify-center border border-[#EDF2F7]">
                         <img
                           src={log.icon}
-                          alt={log.type}
+                          alt=""
                           className="w-5 h-5 object-contain"
                         />
                       </div>
@@ -273,10 +288,113 @@ function App() {
               )}
             </div>
           </div>
-        ) : !selectedFriend ? (
-          <>
+        )}
+
+        {currentPage === 'stats' && (
+          <section className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-5 duration-500">
+            <h1 className="text-6xl font-black text-[#0F172A] mb-12 tracking-tighter text-center md:text-left">
+              Friendship Analytics
+            </h1>
+
+            <div className="bg-white p-12 rounded-[40px] border border-[#F1F5F9] shadow-sm flex flex-col items-center">
+              <div className="w-full text-left mb-10">
+                <h2 className="text-[#64748B] text-xl font-bold">
+                  By Interaction Type
+                </h2>
+              </div>
+
+              
+              <div className="relative w-72 h-72 flex items-center justify-center">
+                <svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 180 180"
+                  className="-rotate-90"
+                >
+                  <circle
+                    cx="90"
+                    cy="90"
+                    r="70"
+                    fill="none"
+                    stroke="#F1F5F9"
+                    strokeWidth="18"
+                  />
+                 
+                  <circle
+                    cx="90"
+                    cy="90"
+                    r="70"
+                    fill="none"
+                    stroke="#244D3F"
+                    strokeWidth="20"
+                    strokeDasharray={calculateSlice(videoCount)}
+                    strokeDashoffset="0"
+                    strokeLinecap="round"
+                    className="transition-all duration-700"
+                  />
+                 
+                  <circle
+                    cx="90"
+                    cy="90"
+                    r="70"
+                    fill="none"
+                    stroke="#4ADE80"
+                    strokeWidth="20"
+                    strokeDasharray={calculateSlice(callCount)}
+                    strokeDashoffset={
+                      calculateSlice(videoCount).split(' ')[0] * -1
+                    }
+                    strokeLinecap="round"
+                    className="transition-all duration-700"
+                  />
+                
+                  <circle
+                    cx="90"
+                    cy="90"
+                    r="70"
+                    fill="none"
+                    stroke="#8B5CF6"
+                    strokeWidth="20"
+                    strokeDasharray={calculateSlice(messageCount)}
+                    strokeDashoffset={
+                      calculateSlice(videoCount).split(' ')[0] * -1 +
+                      calculateSlice(callCount).split(' ')[0] * -1
+                    }
+                    strokeLinecap="round"
+                    className="transition-all duration-700"
+                  />
+                </svg>
+              </div>
+
+              {/* Legend with Dots */}
+              <div className="flex flex-wrap justify-center gap-10 mt-16">
+                <div className="flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#8B5CF6]"></div>
+                  <span className="text-sm font-bold text-[#64748B] uppercase tracking-wider">
+                    Text
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#4ADE80]"></div>
+                  <span className="text-sm font-bold text-[#64748B] uppercase tracking-wider">
+                    Call
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#244D3F]"></div>
+                  <span className="text-sm font-bold text-[#64748B] uppercase tracking-wider">
+                    Video
+                  </span>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {currentPage === 'home' && !selectedFriend && (
+          <div className="animate-in fade-in duration-500">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-[#0F172A] mb-4">
+              <h2 className="text-4xl font-bold text-[#0F172A] mb-4 tracking-tighter">
                 Friends to keep close in your life
               </h2>
               <p className="text-[#64748B] max-w-lg mx-auto mb-8 text-lg">
@@ -292,7 +410,7 @@ function App() {
                 { label: 'Total Friends', value: 10 },
                 { label: 'On Track', value: 3 },
                 { label: 'Need Attention', value: 6 },
-                { label: 'Interactions This Month', value: 12 },
+                { label: 'Interactions', value: totalRaw },
               ].map((s, i) => (
                 <div
                   key={i}
@@ -342,8 +460,10 @@ function App() {
                 ))}
               </div>
             </section>
-          </>
-        ) : (
+          </div>
+        )}
+
+        {selectedFriend && currentPage === 'home' && (
           <div className="max-w-4xl mx-auto animate-in fade-in duration-300">
             <button
               onClick={() => setSelectedFriend(null)}
@@ -381,7 +501,7 @@ function App() {
                   <div className="bg-white p-6 rounded-2xl border border-[#F1F5F9] text-center shadow-sm">
                     <p className="text-3xl font-bold">{selectedFriend.days}</p>
                     <p className="text-[10px] text-[#94A3B8] font-bold uppercase mt-1">
-                      Days Since Contact
+                      Days Since
                     </p>
                   </div>
                   <div className="bg-white p-6 rounded-2xl border border-[#F1F5F9] text-center shadow-sm">
@@ -406,10 +526,8 @@ function App() {
                       }
                       className="flex flex-col items-center gap-3 p-6 border border-[#F1F5F9] rounded-2xl hover:bg-gray-50 transition-all group"
                     >
-                      <img src={callImg} className="h-6 w-auto" alt="Call" />
-                      <span className="text-xs font-bold uppercase tracking-wider">
-                        Call
-                      </span>
+                      <img src={callImg} className="h-6 w-auto" alt="" />
+                      <span className="text-xs font-bold uppercase">Call</span>
                     </button>
                     <button
                       onClick={() =>
@@ -417,10 +535,8 @@ function App() {
                       }
                       className="flex flex-col items-center gap-3 p-6 border border-[#F1F5F9] rounded-2xl hover:bg-gray-50 transition-all group"
                     >
-                      <img src={textImg} className="h-6 w-auto" alt="Text" />
-                      <span className="text-xs font-bold uppercase tracking-wider">
-                        Text
-                      </span>
+                      <img src={textImg} className="h-6 w-auto" alt="" />
+                      <span className="text-xs font-bold uppercase">Text</span>
                     </button>
                     <button
                       onClick={() =>
@@ -428,10 +544,8 @@ function App() {
                       }
                       className="flex flex-col items-center gap-3 p-6 border border-[#F1F5F9] rounded-2xl hover:bg-gray-50 transition-all group"
                     >
-                      <img src={videoImg} className="h-6 w-auto" alt="Video" />
-                      <span className="text-xs font-bold uppercase tracking-wider">
-                        Video
-                      </span>
+                      <img src={videoImg} className="h-6 w-auto" alt="" />
+                      <span className="text-xs font-bold uppercase">Video</span>
                     </button>
                   </div>
                 </div>
@@ -439,10 +553,11 @@ function App() {
             </div>
           </div>
         )}
+        
       </main>
 
       <footer className="bg-[#244D3F] text-white py-16 px-4 md:px-[10%] mt-auto text-center">
-        <h2 className="text-4xl font-bold mb-4">KeenKeeper</h2>
+        <h2 className="text-4xl font-bold mb-4 tracking-tighter">KeenKeeper</h2>
         <p className="text-[#98B5AB] max-w-xl mx-auto mb-10 text-lg">
           Your personal shelf of meaningful connections. Browse, tend, and
           nurture the relationships that matter most.
@@ -454,7 +569,7 @@ function App() {
               href="#"
               className="w-10 h-10 flex items-center justify-center rounded-full border border-[#406757] hover:bg-[#2d5d4c] transition-all"
             >
-              <img src={icon} alt="Social" className="w-5 h-5 object-contain" />
+              <img src={icon} alt="" className="w-5 h-5 object-contain" />
             </a>
           ))}
         </div>
