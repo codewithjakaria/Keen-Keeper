@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import logoImg from './assets/logo.png';
 import callImg from './assets/call.png';
@@ -178,6 +179,8 @@ function App() {
     return `${(count / totalInteractions) * circumference} ${circumference}`;
   };
 
+  const isInvalidPage = !['home', 'timeline', 'stats'].includes(currentPage);
+
   return (
     <div className="min-h-screen bg-white font-sans text-[#1E293B] flex flex-col">
       <header className="border-b border-[#E9E9E9] px-4 py-3 md:px-[10%] sticky top-0 bg-white z-50">
@@ -224,7 +227,24 @@ function App() {
       </header>
 
       <main className="flex-grow max-w-6xl mx-auto px-6 py-12 w-full">
-        {currentPage === 'timeline' && (
+        {isInvalidPage && (
+          <div className="flex flex-col items-center justify-center py-32 text-center animate-in fade-in duration-500 bg-[#F8FAFC] rounded-[40px] border border-[#F1F5F9]">
+            <h1 className="text-[140px] font-black text-[#1E293B] leading-none mb-4 tracking-tighter">
+              404
+            </h1>
+            <h2 className="text-4xl font-bold text-[#1E293B] mb-6 tracking-tighter">
+              Page Not Found
+            </h2>
+            <button
+              onClick={() => setCurrentPage('home')}
+              className="text-[#3B82F6] font-medium text-xl hover:underline underline-offset-4 transition-all"
+            >
+              Go back home
+            </button>
+          </div>
+        )}
+
+        {!isInvalidPage && currentPage === 'timeline' && (
           <div className="max-w-2xl mx-auto animate-in fade-in duration-500">
             <h2 className="text-4xl font-bold text-[#0F172A] mb-2 tracking-tighter">
               Timeline
@@ -290,20 +310,17 @@ function App() {
           </div>
         )}
 
-        {currentPage === 'stats' && (
+        {!isInvalidPage && currentPage === 'stats' && (
           <section className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-5 duration-500">
             <h1 className="text-6xl font-black text-[#0F172A] mb-12 tracking-tighter text-center md:text-left">
               Friendship Analytics
             </h1>
-
             <div className="bg-white p-12 rounded-[40px] border border-[#F1F5F9] shadow-sm flex flex-col items-center">
               <div className="w-full text-left mb-10">
                 <h2 className="text-[#64748B] text-xl font-bold">
                   By Interaction Type
                 </h2>
               </div>
-
-              
               <div className="relative w-72 h-72 flex items-center justify-center">
                 <svg
                   width="100%"
@@ -319,7 +336,6 @@ function App() {
                     stroke="#F1F5F9"
                     strokeWidth="18"
                   />
-                 
                   <circle
                     cx="90"
                     cy="90"
@@ -332,7 +348,6 @@ function App() {
                     strokeLinecap="round"
                     className="transition-all duration-700"
                   />
-                 
                   <circle
                     cx="90"
                     cy="90"
@@ -347,7 +362,6 @@ function App() {
                     strokeLinecap="round"
                     className="transition-all duration-700"
                   />
-                
                   <circle
                     cx="90"
                     cy="90"
@@ -365,8 +379,6 @@ function App() {
                   />
                 </svg>
               </div>
-
-              {/* Legend with Dots */}
               <div className="flex flex-wrap justify-center gap-10 mt-16">
                 <div className="flex items-center gap-3">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#8B5CF6]"></div>
@@ -391,7 +403,7 @@ function App() {
           </section>
         )}
 
-        {currentPage === 'home' && !selectedFriend && (
+        {!isInvalidPage && currentPage === 'home' && !selectedFriend && (
           <div className="animate-in fade-in duration-500">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-[#0F172A] mb-4 tracking-tighter">
@@ -410,7 +422,7 @@ function App() {
                 { label: 'Total Friends', value: 10 },
                 { label: 'On Track', value: 3 },
                 { label: 'Need Attention', value: 6 },
-                { label: 'Interactions', value: totalRaw },
+                { label: 'Interactions', value: 12 },
               ].map((s, i) => (
                 <div
                   key={i}
@@ -463,7 +475,7 @@ function App() {
           </div>
         )}
 
-        {selectedFriend && currentPage === 'home' && (
+        {!isInvalidPage && selectedFriend && currentPage === 'home' && (
           <div className="max-w-4xl mx-auto animate-in fade-in duration-300">
             <button
               onClick={() => setSelectedFriend(null)}
@@ -553,7 +565,6 @@ function App() {
             </div>
           </div>
         )}
-        
       </main>
 
       <footer className="bg-[#244D3F] text-white py-16 px-4 md:px-[10%] mt-auto text-center">
