@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   BrowserRouter,
   Routes,
@@ -24,7 +24,32 @@ import {
   BellOff,
   Archive,
   ChevronDown,
+  Loader2,
 } from 'lucide-react';
+
+function PageLoader({ children }) {
+  const [loading, setLoading] = useState(true);
+  const location = useLocation();
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => setLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] bg-white">
+        <Loader2 className="w-12 h-12 text-[#244D3F] animate-spin mb-4" />
+        <p className="text-[#244D3F] font-bold text-lg tracking-tighter animate-pulse">
+          KeenKeeper is loading...
+        </p>
+      </div>
+    );
+  }
+
+  return <div className="animate-in fade-in duration-500">{children}</div>;
+}
 
 function Layout({ children, setSelectedFriend }) {
   const navigate = useNavigate();
@@ -76,7 +101,7 @@ function Layout({ children, setSelectedFriend }) {
       </header>
 
       <main className="flex-grow max-w-6xl mx-auto px-6 py-12 w-full">
-        {children}
+        <PageLoader>{children}</PageLoader>
       </main>
 
       <footer className="bg-[#244D3F] text-white py-16 px-4 md:px-[10%] mt-auto text-center">
@@ -379,7 +404,7 @@ function AppContent() {
                     { label: 'Total Friends', value: 12 },
                     { label: 'On Track', value: 4 },
                     { label: 'Need Attention', value: 8 },
-                    { label: 'Interactions', value: timeline.length },
+                    { label: 'Interactions', value: 12 },
                   ].map((s, i) => (
                     <div
                       key={i}
@@ -436,12 +461,11 @@ function AppContent() {
           </Layout>
         }
       />
-
       <Route
         path="/timeline"
         element={
           <Layout setSelectedFriend={setSelectedFriend}>
-            <div className="max-w-2xl mx-auto animate-in fade-in duration-500">
+            <div className="max-w-2xl mx-auto">
               <h2 className="text-4xl font-bold text-[#0F172A] mb-2 tracking-tighter">
                 Timeline
               </h2>
@@ -509,12 +533,11 @@ function AppContent() {
           </Layout>
         }
       />
-
       <Route
         path="/stats"
         element={
           <Layout setSelectedFriend={setSelectedFriend}>
-            <section className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-5 duration-500">
+            <section className="max-w-4xl mx-auto">
               <h1 className="text-6xl font-black text-[#0F172A] mb-12 tracking-tighter text-center md:text-left">
                 Friendship Analytics
               </h1>
@@ -606,11 +629,10 @@ function AppContent() {
           </Layout>
         }
       />
-
       <Route
         path="*"
         element={
-          <div className="min-h-screen flex flex-col items-center justify-center text-center p-6 bg-[#F8FAFC] animate-in fade-in duration-500">
+          <div className="min-h-screen flex flex-col items-center justify-center text-center p-6 bg-[#F8FAFC]">
             <h1 className="text-[120px] md:text-[180px] font-black text-[#1E293B] leading-none mb-4 tracking-tighter">
               404
             </h1>
@@ -618,8 +640,7 @@ function AppContent() {
               Page Not Found
             </h2>
             <p className="text-[#64748B] text-lg mb-10 max-w-md mx-auto">
-              Sorry, the page you are looking for doesn't exist or has been
-              moved.
+              Sorry, the page you are looking for doesn't exist.
             </p>
             <button
               onClick={() => navigate('/')}
