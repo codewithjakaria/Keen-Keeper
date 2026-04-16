@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import {
   BrowserRouter,
@@ -27,8 +26,9 @@ import {
   Archive,
   ChevronDown,
   Loader2,
+  Menu,
+  X,
 } from 'lucide-react';
-
 
 function PageLoader({ children }) {
   const [loading, setLoading] = useState(true);
@@ -54,57 +54,94 @@ function PageLoader({ children }) {
   return <div className="animate-in fade-in duration-500">{children}</div>;
 }
 
-
 function Layout({ children, setSelectedFriend }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-white font-sans text-[#1E293B] flex flex-col">
       <Toaster position="top-center" reverseOrder={false} />
       <header className="border-b border-[#E9E9E9] px-4 py-3 md:px-[10%] sticky top-0 bg-white z-50">
         <nav className="flex items-center justify-between max-w-7xl mx-auto">
+         
           <div
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => {
               setSelectedFriend(null);
+              setIsMenuOpen(false); 
               navigate('/');
             }}
           >
             <img src={logoImg} alt="logo" className="h-8 w-auto" />
           </div>
-          <div className="flex items-center gap-4">
+
+          
+          <div className="hidden md:flex items-center gap-4">
             <NavLink
               to="/"
-              onClick={() => setSelectedFriend(null)}
               className={({ isActive }) =>
-                `flex items-center gap-2 text-sm font-medium px-5 py-2 rounded-full transition-all ${isActive && location.pathname === '/' ? 'bg-[#244D3F] text-white' : 'text-[#64748B]'}`
+                `flex items-center gap-2 text-sm font-medium px-5 py-2 rounded-full ${isActive ? 'bg-[#244D3F] text-white' : 'text-[#64748B]'}`
               }
             >
               <Home size={18} /> Home
             </NavLink>
             <NavLink
               to="/timeline"
-              onClick={() => setSelectedFriend(null)}
               className={({ isActive }) =>
-                `flex items-center gap-2 text-sm font-medium px-5 py-2 rounded-full transition-all ${isActive ? 'bg-[#244D3F] text-white' : 'text-[#64748B]'}`
+                `flex items-center gap-2 text-sm font-medium px-5 py-2 rounded-full ${isActive ? 'bg-[#244D3F] text-white' : 'text-[#64748B]'}`
               }
             >
               <TimerReset size={18} /> Timeline
             </NavLink>
             <NavLink
               to="/stats"
-              onClick={() => setSelectedFriend(null)}
               className={({ isActive }) =>
-                `flex items-center gap-2 text-sm font-medium px-5 py-2 rounded-full transition-all ${isActive ? 'bg-[#244D3F] text-white' : 'text-[#64748B]'}`
+                `flex items-center gap-2 text-sm font-medium px-5 py-2 rounded-full ${isActive ? 'bg-[#244D3F] text-white' : 'text-[#64748B]'}`
               }
             >
               <BarChart3 size={18} /> Stats
             </NavLink>
           </div>
-        </nav>
-      </header>
 
+          
+          <button
+            className="md:hidden p-2 text-[#244D3F]"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </nav>
+
+       
+        {isMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 w-full bg-white border-b border-[#E9E9E9] py-4 px-6 shadow-xl animate-in slide-in-from-top duration-300">
+            <div className="flex flex-col gap-3">
+              <NavLink
+                to="/"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-3 text-base font-bold p-4 rounded-2xl bg-gray-50 text-[#64748B]"
+              >
+                <Home size={20} /> Home
+              </NavLink>
+              <NavLink
+                to="/timeline"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-3 text-base font-bold p-4 rounded-2xl bg-gray-50 text-[#64748B]"
+              >
+                <TimerReset size={20} /> Timeline
+              </NavLink>
+              <NavLink
+                to="/stats"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-3 text-base font-bold p-4 rounded-2xl bg-gray-50 text-[#64748B]"
+              >
+                <BarChart3 size={20} /> Stats
+              </NavLink>
+            </div>
+          </div>
+        )}
+      </header>
       <main className="flex-grow max-w-6xl mx-auto px-6 py-12 w-full">
         <PageLoader>{children}</PageLoader>
       </main>
@@ -141,7 +178,6 @@ function Layout({ children, setSelectedFriend }) {
     </div>
   );
 }
-
 
 function AppContent() {
   const [selectedFriend, setSelectedFriend] = useState(null);
