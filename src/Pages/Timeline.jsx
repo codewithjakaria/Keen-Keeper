@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, Trash2 } from 'lucide-react';
-import Layout from './Layout';
+import Layout from '../Components/Layout';
 
 export default function Timeline({ setSelectedFriend, timeline, setTimeline }) {
   const [filter, setFilter] = useState('All');

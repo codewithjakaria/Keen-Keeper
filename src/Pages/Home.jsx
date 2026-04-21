@@ -1,11 +1,11 @@
-
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { ArrowLeft, BellOff, Archive, Trash2, Plus } from 'lucide-react';
-import Layout from './Layout';
-import callImg from './assets/call.png';
-import textImg from './assets/text.png';
-import videoImg from './assets/video.png';
+import Layout from '../Components/Layout';
+import callImg from '../assets/call.png';
+import textImg from '../assets/text.png';
+import videoImg from '../assets/video.png';
 
 const FRIENDS = [
   {

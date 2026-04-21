@@ -3,10 +3,10 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { Home, TimerReset, BarChart3, Menu, X } from 'lucide-react';
 import PageLoader from './PageLoader';
-import logoImg from './assets/logo.png';
-import facebookImg from './assets/facebook.png';
-import instagramImg from './assets/instagram.png';
-import twitterImg from './assets/twitter.png';
+import logoImg from '../assets/logo.png';
+import facebookImg from '../assets/facebook.png';
+import instagramImg from '../assets/instagram.png';
+import twitterImg from '../assets/twitter.png';
 
 export default function Layout({ children, setSelectedFriend }) {
   const navigate = useNavigate();

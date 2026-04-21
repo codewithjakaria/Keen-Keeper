@@ -1,4 +1,4 @@
-import Layout from './Layout';
+import Layout from '../Components/Layout';
 
 export default function Stats({ setSelectedFriend, timeline }) {
   const videoCount = timeline.filter(item => item.type === 'Video').length;

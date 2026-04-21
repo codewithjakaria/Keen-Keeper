@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import Home from './Home';
-import Timeline from './Timeline';
-import Stats from './Stats';
+import Home from './Pages/Home';
+import Timeline from './Pages/Timeline';
+import Stats from './Pages/Stats';
 
 function AppContent() {
   const [selectedFriend, setSelectedFriend] = useState(null);
